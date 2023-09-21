@@ -44,15 +44,14 @@ countResult:
 		sub t0,t0,t1
 		bge t0, t1, loop
 	loopEnd:
-		j checkSigns
 checkSigns:
-	blt t3, zero, changeReminderSign
-	j noChangeReminder
-	changeReminderSign:
+	blt t3, zero, changeRemainderSign
+	j noChangeRemainder
+	changeRemainderSign:
 		sub, t0, zero, t0
 		beqz t4, changeResultSign
 		j end
-	noChangeReminder:
+	noChangeRemainder:
 	blt t4, zero, changeResultSign
 	j end
 	changeResultSign:
@@ -83,7 +82,6 @@ printResult:
 	mv a0, t0
 	li a7, 1
 	ecall
-	j programEnd
 programEnd:
 	li      a7 10
         ecall
