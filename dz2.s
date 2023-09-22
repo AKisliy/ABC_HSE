@@ -36,15 +36,13 @@
         # t2 - result
         # t3 - знак делимого
         # t4 - знак делителя
-        
-countResult:      
+            
 	blt t0, t1, loopEnd
 	loop:
 		addi t2, t2,1
 		sub t0,t0,t1
 		bge t0, t1, loop
 	loopEnd:
-checkSigns:
 	blt t3, zero, changeRemainderSign
 	j noChangeRemainder
 	changeRemainderSign:
