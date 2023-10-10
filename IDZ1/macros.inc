@@ -19,3 +19,14 @@
 	li a7,10
 	ecall
 .end_macro
+
+.macro putNumInArray(%arrReg, %num)
+	li t1, %num
+	sw t1, (%arrReg)
+	addi %arrReg, %arrReg, 4
+.end_macro
+
+.macro putRegInArray(%arrReg, %reg)
+	sw %reg, (%arrReg)
+	addi %arrReg, %arrReg, 4
+.end_macro
