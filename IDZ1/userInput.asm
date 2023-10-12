@@ -4,7 +4,7 @@
 .data
 askMessage: .asciz "Input array size(1-10):"
 wrongSizeMessage: .asciz "Wrong size!!! Try again!\n"
-wrongTypeMessage: .asciz "Wrong type!! Try again!\n"
+wrongTypeMessage: .asciz "Wrong type!! Try again:"
 enterNum: .asciz "Please enter number:"
 chooseProgramType: .asciz "Please, choose program type: 0 - normal mode, 1 - auto tests:"
 
@@ -12,8 +12,7 @@ chooseProgramType: .asciz "Please, choose program type: 0 - normal mode, 1 - aut
 userInputNum:
 	push(ra) # store returning adress to stack
 	print_str(enterNum)
-	li a7,5
-	ecall
+	read_int
 	pop(ra) # get returning adress from stack
 	push(a0) # store returning value
 	ret
@@ -21,8 +20,7 @@ userInputSize:
 	push(ra) # store returning adress to stack
 	inputLoop:
 	print_str(askMessage)
-	li a7, 5
-	ecall
+	read_int
 	blt a0,s2, tryAgain
 	bgt a0, s3, tryAgain
 	j endInputLoop
@@ -37,8 +35,7 @@ userInputType:
 	push(ra)
 	print_str(chooseProgramType)
 	typeLoop:
-	li a7, 5
-	ecall
+	read_int
 	bltz a0, tryAgainType
 	bgt a0,s2,tryAgainType
 	j endTypeLoop
