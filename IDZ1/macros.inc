@@ -4,6 +4,11 @@
 	ecall
 .end_macro
 
+.macro read_int
+	li a7 5
+	ecall
+.end_macro
+
 .macro push(%reg)
 	addi sp, sp, -4
 	sw %reg, (sp)
