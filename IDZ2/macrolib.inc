@@ -1,12 +1,17 @@
 .data
 inputMessage: .asciz "Input x to calculate arctan(x): "
 errorMessage: .asciz "We can calculate arctan(x) using Taylor series only for x in [-1,1]. Try again: "
-result: .asciz "arctan(x) = "
+wrongTypeMessage: .asciz "Wrong type!! Try again:"
+chooseProgramType: .asciz "Please, choose program type: 0 - normal mode, 1 - auto tests:"
+resultFirstPart: .asciz "arctan("
+resultSecondPart: .asciz ") = "
 ln: .asciz "\n"
 
-.macro printArctanFrom(%reg)
-	printStr(result)
-	printdouble(%reg)
+.macro printArctan(%x, %res)
+	printStr(resultFirstPart)
+	printDouble(%x)
+	printStr(resultSecondPart)
+	printDouble(%res)
 	printStr(ln)
 .end_macro
 
@@ -16,7 +21,7 @@ ln: .asciz "\n"
 	ecall
 .end_macro
 
-.macro printdouble(%reg)
+.macro printDouble(%reg)
 	fmv.d fa0, %reg
 	li a7,3
 	ecall
@@ -25,7 +30,7 @@ ln: .asciz "\n"
 .macro userInput
 	printStr(inputMessage)
 	inputLoop:
-	readdouble
+	readDouble
 	putInFRegister(1, ft0)
 	putInFRegister(-1, ft1)
 	flt.d t0, fa0, ft1
@@ -39,7 +44,26 @@ ln: .asciz "\n"
 	end:
 .end_macro
 
-.macro readdouble
+.macro userInputType
+	printStr(chooseProgramType)
+	li t0, 1
+	typeLoop:
+	readInt
+	bltz a0, tryAgainType
+	bgt a0,t0,tryAgainType
+	j endTypeLoop
+	tryAgainType:
+	printStr(wrongTypeMessage)
+	j typeLoop
+	endTypeLoop:
+.end_macro
+
+.macro readInt
+	li a7, 5
+	ecall
+.end_macro
+
+.macro readDouble
 	li a7, 7
 	ecall
 .end_macro
