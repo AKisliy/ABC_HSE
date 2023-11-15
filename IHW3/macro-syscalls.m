@@ -77,6 +77,13 @@ str: .asciz %x
 	jal loadText
 .end_macro
 
+.macro write_result(%vowels, %consonants)
+	mv a0, %vowels
+	mv a1, %consonants
+	jal writeResult
+.end_macro
+	
+
 .macro str_get(%strbuf, %size)
     la      a0 %strbuf
     li      a1 %size
@@ -89,7 +96,7 @@ str: .asciz %x
     la	s1	%strbuf
 next:
     lb	s2  (s1)
-    beq s0	s2	replace
+    beq s0   s2	replace
     addi s1 s1 1
     b	next
 replace:
@@ -103,9 +110,9 @@ replace:
 .eqv WRITE_ONLY	1	
 .eqv APPEND	9	
 .macro open(%file_name, %opt)
-    li   	a7 1024     	
-    la      a0 %file_name 
-    li   	a1 %opt 
+    li   a7 1024     	
+    la   a0 %file_name 
+    li   a1 %opt 
     ecall
 .end_macro
 
@@ -129,11 +136,3 @@ replace:
     ecall             	
 .end_macro
 
-.macro print_change_of_string(%before, %after)
-.data
-arrow: .asciz " -> "
-.text
-	print_str_from_label(%before)
-	print_str_from_label(arrow)
-	print_str_from_label(%after)
-.end_macro
