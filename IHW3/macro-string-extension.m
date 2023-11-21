@@ -11,12 +11,12 @@
 		addi s1, s1, 1
 		j loop
 	endLoop:
-	addi s1, s1, -1
+	addi s1, s1, -1 # s1 now points to the last symbol
 	changeLoop:
 		bge s0, s1, endChange
 		lb t0, (s0) # char from left pointer
 		lb t1, (s1) # char from right pointer
-		sb t0, (s1) 
+		sb t0, (s1) # swap
 		sb t1, (s0)
 		addi s1, s1, -1
 		addi s0, s0, 1
@@ -52,7 +52,7 @@
 	pop(a0)
 .end_macro
 
-.macro to_string(%in, %number) # convert int number from register %number into string on label %in (max number length - 10240)
+.macro to_string(%in, %number) # convert int number from register %number into string on label %in (max number's length - 10000)
 	push(t0)
 	push(t1)
 	push(t2)
@@ -72,7 +72,6 @@
 	addi t5,t5,1
 	j loop
 	endLoop:
-	#addi t5, t5,1
 	li t1,'\0'
 	sb t1, (t5)
 	reverse(%in)
@@ -89,7 +88,14 @@
 	jal strlen
 .end_macro
 
+.macro strlen_reg(%reg) # returns length of string in register %reg
+	mv a0 %reg
+	jal strlen
+.end_macro
+
 .macro writeStringToFile(%str, %file_desc)
 	
 .end_macro
+	
+
 	
