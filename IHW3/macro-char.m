@@ -4,24 +4,24 @@ upperStr: .asciz "AOEIUY"
 .macro isVowel(%ch) # check whether %ch is vowel or not( a0 = 1 - True, a0 = 0 - False)
 	push(t0) # we don't have to save t-registers, but for convenience i did it
 	push(t1)
-	isUpper(%ch)
-	bgtz a0, upper # if %ch is upper - try to find in upper vowels
-	isLower(%ch)
-	bgtz a0, lower # if %ch is lower - try to find in lower vowels
-	li a0, 1
-	upper:
-	la t0, upperStr
-	j findLoop
-	lower:
+	li a0, 0
 	la t0, lowerStr
-	findLoop: # iterate over upper or lower vowel string
+	findLoopLower: # iterate over lower vowel string
 		lb t1, (t0)
-		beqz t1, changeResult # if didn't find - change result to 0
-		beq t1,%ch, end # if find - return 1
+		beqz t1, findLoopUpper # if didn't find - try to find in upper 
+		beq t1,%ch, change # if find - return 1
 		addi t0, t0, 1
-		j findLoop
-	changeResult:
-		li a0, 0
+		j findLoopLower
+	findLoopUpper:
+		la t0, upperStr
+		loop:
+		lb t1, (t0)
+		beqz t1, end # if didn't find - return 0
+		beq t1,%ch, change # if find - return 1
+		addi t0, t0, 1
+		j loop
+	change:
+		li a0, 1
 	end:
 	pop(t1)
 	pop(t0)
@@ -59,5 +59,7 @@ upperStr: .asciz "AOEIUY"
 	pop(t1)
 	pop(t0)
 .end_macro
+	
+
 	
 	
