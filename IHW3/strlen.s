@@ -1,4 +1,4 @@
-.globl strlen
+.global strlen
 
 .include "macro-syscalls.m"
 
