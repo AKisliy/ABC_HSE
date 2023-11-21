@@ -1,13 +1,15 @@
 .include "macro-syscalls.m"
 .include "macro-string-extension.m"
 .include "macro-char.m"
+.include "macro-custom.m"
 
 
 .global count_vowels
 
 .text
 count_vowels:
-	push(ra)
+	prologue
+	
 	mv s1, a0 # input string
 	li s2, 0 # count vowels
 	li s3, 0 # count consonant
@@ -32,5 +34,9 @@ count_vowels:
 	end:
 	mv a0, s2
 	mv a1, s3
-	pop(ra)
+
+	epilogue
 	ret
+		
+	
+
