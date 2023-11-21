@@ -73,13 +73,15 @@ str: .asciz %x
 	addi sp, sp, 4
 .end_macro
 
-.macro load_text
+.macro loadTextFrom(%path)
+	mv a0, %path
 	jal loadText
 .end_macro
 
-.macro write_result(%vowels, %consonants)
+.macro write_result_to(%vowels, %consonants, %path)
 	mv a0, %vowels
 	mv a1, %consonants
+	mv a2, %path
 	jal writeResult
 .end_macro
 	
@@ -116,6 +118,13 @@ replace:
     ecall
 .end_macro
 
+.macro open_from_reg(%reg, %opt)
+    li   a7 1024     	
+    mv   a0 %reg 
+    li   a1 %opt 
+    ecall
+.end_macro
+
 .macro close(%file_descriptor)
     li   a7, 57     
     mv   a0, %file_descriptor  
@@ -132,7 +141,9 @@ replace:
     li   a7, 63
     mv   a0, %file_descriptor    
     mv   a1, %reg   
-    li   a2, %size 		
+    mv   a2, %size 		
     ecall             	
 .end_macro
+
+
 
