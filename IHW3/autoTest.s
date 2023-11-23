@@ -4,11 +4,11 @@
 
 .global autoTests
 .data
-input1: .asciz "test1.txt"
-input2: .asciz "test2.txt"
-input3: .asciz "test3.txt"
-input4: .asciz "test4.txt"
-input5: .asciz "test5.txt"
+input1: .asciz "test1.txt" # 0 - 0, 1 symbol
+input2: .asciz "test2.txt" # 167 - 202, 445 symbols
+input3: .asciz "test3.txt" # 740 - 2568, 8000 symbols
+input4: .asciz "test4.txt" # 934 - 3174, 12000 symbols
+input5: .asciz "test5.txt" # 106 - 318, 1000 symbols
 testReadEnd:
 output1: .asciz "output1.txt"
 output2: .asciz "output2.txt"
@@ -54,3 +54,4 @@ autoTests:
 	
 	epilogue
 	ret
+
