@@ -63,6 +63,13 @@
 	li t1, '0'
 	li t2, 10
 	la t5, %in
+	bnez t0, cont
+	sb t1, (t5)
+	li t1, '\0'
+	addi t5, t5, 1
+	sb t1, (t5)
+	j end
+	cont:
 	loop:
 	blez t0, endLoop
 	rem t3, t0, t2
@@ -75,6 +82,7 @@
 	li t1,'\0'
 	sb t1, (t5)
 	reverse(%in)
+	end:
 	pop(t5)
 	pop(t4)
 	pop(t3)
@@ -93,9 +101,6 @@
 	jal strlen
 .end_macro
 
-.macro writeStringToFile(%str, %file_desc)
-	
-.end_macro
 	
 
 	
