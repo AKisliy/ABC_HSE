@@ -79,4 +79,3 @@ continue:
 er_read:
     print_str_from_label(er_write_mes)
     exit
-
