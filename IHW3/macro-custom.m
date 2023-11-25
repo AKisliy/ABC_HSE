@@ -1,16 +1,20 @@
 .eqv    NAME_SIZE 256	
 
 .macro userChoice
-	print_str("Do you want to show results in console? Y/N\n")
-	li t0, 'Y'
-	li t1, 'N'
+.data
+message: .asciz "Do you want to show results in console?"
+.text
+	#print_str("Do you want to show results in console? Y/N\n")
+	la a0, message
+	li t0, 0
+	li t1, 1
 	inputLoop:
-	li a7, 12
+	li a7, 50
 	ecall
 	beq a0, t0, endLoop
 	beq a0, t1, endLoop
 	newline
-	print_str("Unknown input!! Try again!")
+	print_warning("Please choose Yes/No!")
 	j inputLoop
 	endLoop:
 .end_macro
@@ -18,18 +22,19 @@
 .macro getReadingPath
 .data
 file_name:      .space	NAME_SIZE
+input: .asciz "Input path to file for reading: "
+err: .asciz "Incorrect file path!"
 .text
-    print_str("ATTENTION!! Only files with a size <= 10 KB will be fully read!\n")
+    print_warning("ATTENTION!! Only files with a size <= 10 KB will be fully read!")
 inputFileLoop:
     push(s1)
-    print_str ("Input path to file for reading: ")
-    str_get(file_name, NAME_SIZE)
+    str_get_java(input,file_name, NAME_SIZE)
     open(file_name, READ_ONLY)
     li		s1 -1			
     beq		a0 s1 tryInputAgain
     j continue
     tryInputAgain:
-    	print_str("Incorrect file path!\n")
+    	print_error("Incorrect file path!\n")
     	j inputFileLoop
     continue:
     pop(s1)
@@ -38,32 +43,31 @@ inputFileLoop:
 .macro getWritingPath
 .data
 file_name:   .space  NAME_SIZE
+output: .asciz "Input path to file for writing: "
 .text
 	push(s1)
 	outputFileLoop: 
-	    print_str ("Input path to file for writing: ")
-	    str_get(file_name, NAME_SIZE) 
+	    str_get_java(output, file_name, NAME_SIZE) 
 	    open(file_name, WRITE_ONLY)
 	    li		s1 -1
 	    beq		a0 s1 tryOutputAgain
 	    j	continue
 	tryOutputAgain:
-		print_str("Incorrect file path!\n")
+		print_error("Incorrect file path!\n")
 	    	j outputFileLoop
 	 continue:
 	 pop(s1)
 .end_macro
 
 .macro userInputType
-	print_str("Please, choose program type: 0 - normal mode, 1 - auto tests:")
+	print_str_get_int("Please, choose program type: 0 - normal mode, 1 - auto tests:")
 	li t0, 1
 	typeLoop:
-	read_int_a0
 	bltz a0, tryAgainType
 	bgt a0,t0,tryAgainType
 	j endTypeLoop
 	tryAgainType:
-	print_str("Wrong type!! Try again:")
+	print_str_get_int("Wrong type!! Try again:")
 	j typeLoop
 	endTypeLoop:
 .end_macro
