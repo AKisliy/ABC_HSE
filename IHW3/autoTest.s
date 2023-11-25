@@ -5,7 +5,7 @@
 .global autoTests
 .data
 input1: .asciz "test1.txt" # 0 - 0, 1 symbol
-input2: .asciz "test2.txt" # 167 - 202, 445 symbols
+input2: .asciz "test2.txt" # 167 - 202, 
 input3: .asciz "test3.txt" # 740 - 2568, 8000 symbols
 input4: .asciz "test4.txt" # 934 - 3174, 12000 symbols
 input5: .asciz "test5.txt" # 106 - 318, 1000 symbols
@@ -27,7 +27,7 @@ autoTests:
 	la s1, output1
 	la s7, testReadEnd
 	la s8, testWriteEnd
-	print_str("Starting autotests! Be patient, it will take some time..\n")
+	print_information("Starting autotests! Be patient, it will take some time..(check console)\n")
 	testingLoop:
 		print_str("Processing test..\n")
 		open_from_reg(s0, READ_ONLY)
@@ -48,10 +48,9 @@ autoTests:
 		beq s0, s7, end
 		j testingLoop
 	end:
-	print_str("Tests end successfully!! Check files(names output*.txt) with result in current directory")
+	print_information("Tests end successfully!! Check files(names output*.txt) with result in current directory")
 	pop(t1)
 	pop(t0)
 	
 	epilogue
 	ret
-
