@@ -101,6 +101,4 @@
 	jal strlen
 .end_macro
 
-	
 
-	
