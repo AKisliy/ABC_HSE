@@ -53,4 +53,3 @@ end_loop:
 er_read:
 print_str_from_label(er_read_mes)
 exit
-
