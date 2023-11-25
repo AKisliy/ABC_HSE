@@ -60,6 +60,3 @@ upperStr: .asciz "AOEIUY"
 	pop(t0)
 .end_macro
 	
-
-	
-	
