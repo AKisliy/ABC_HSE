@@ -11,7 +11,7 @@ main:
     exit
     
     manual:
-    userChoice # userchoice() -> Y or N in a0
+    userChoice # userchoice() -> 1(no) or 0(yes) in a0
     mv s0, a0
     
     newline
@@ -27,7 +27,7 @@ main:
     mv s4, a0
     write_result_to(s10,s11, s4) # write_result(int numOfVowels, int numOfConsonants, descriptor) - writes results of count in file
     
-    li t0, 'Y' # print in console or not?
+    li t0, 0 # print in console or not?
     bne t0, s0, noPrint
     
     print_str("Number of vowels in your file: ")
@@ -38,5 +38,3 @@ main:
     print_int(s11)
     noPrint:
     exit
-
-
