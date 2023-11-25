@@ -34,6 +34,36 @@ str: .asciz %x
 	pop(a0)
 .end_macro
 
+.macro print_str_get_int(%x)
+.data
+str: .asciz %x
+.text
+	li a7, 51
+	la a0, str
+	ecall
+.end_macro
+
+.macro print_warning(%x)
+.data
+str: .asciz %x
+.text
+	li a7, 55
+	li a1,2
+	la a0, str
+	ecall
+.end_macro
+
+.macro print_error(%x)
+.data
+str: .asciz %x
+.text
+	li a7, 55
+	li a1,0
+	la a0, str
+	ecall
+.end_macro
+
+
 .macro print_str_from_label(%str)
 	la a0, %str
 	li a7,4
@@ -108,6 +138,29 @@ replace:
     pop(s0)
 .end_macro
 
+.macro str_get_java(%message,%strbuf, %size)
+    la a0, %message
+    la      a1 %strbuf
+    li      a2 %size
+    li      a7 54
+    ecall
+    push(s0)
+    push(s1)
+    push(s2)
+    li	s0 '\n'
+    la	s1	%strbuf
+next:
+    lb	s2  (s1)
+    beq s0   s2	replace
+    addi s1 s1 1
+    b	next
+replace:
+    sb	zero (s1)
+    pop(s2)
+    pop(s1)
+    pop(s0)
+.end_macro
+
 .eqv READ_ONLY	0	
 .eqv WRITE_ONLY	1	
 .eqv APPEND	9	
@@ -145,5 +198,14 @@ replace:
     ecall             	
 .end_macro
 
-
+.macro print_information(%x)
+.data
+str: .asciz %x
+.text
+	li a7, 55
+	li a1,1
+	la a0, str
+	ecall
+.end_macro
+  
 
