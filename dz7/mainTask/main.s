@@ -20,7 +20,7 @@ main:
 	loopSecond:
 		beq s0, s1, end
 		hex_print(s0,s2)
-		sleep(1)
+		sleep(1000)
 		addi s0, s0, 1
 		j loopSecond
 	end:
