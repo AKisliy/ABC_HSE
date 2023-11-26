@@ -5,7 +5,7 @@
 .global autoTests
 .data
 input1: .asciz "test1.txt" # 0 - 0, 1 symbol
-input2: .asciz "test2.txt" # 167 - 202, 
+input2: .asciz "test2.txt" # 167 - 202, 445 symbols
 input3: .asciz "test3.txt" # 740 - 2568, 8000 symbols
 input4: .asciz "test4.txt" # 934 - 3174, 12000 symbols
 input5: .asciz "test5.txt" # 106 - 318, 1000 symbols
