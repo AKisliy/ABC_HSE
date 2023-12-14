@@ -3,6 +3,7 @@
 #include <random>
 #include <functional>
 #include <pthread.h>
+#include <fstream>
 
 
 const int NUM_FLOWERS = 40;
@@ -20,6 +21,9 @@ FlowerState flowerStates[NUM_FLOWERS];
 // mutexes
 pthread_mutex_t flowerMutex[NUM_FLOWERS];
 pthread_mutex_t coutMutex;
+pthread_mutex_t fileMutex;
+
+std::ofstream fileWriter;
 
 // simulate flower's "work"
 void* flowerRoutine(void* arg) {
@@ -37,28 +41,38 @@ void* flowerRoutine(void* arg) {
         if (flowerStates[flowerId] == FlowerState::DEAD || flowerStates[flowerId] == FlowerState::WITHERED) {
             break;
         }
-            // simulate flower's action
+        // simulate flower's action
         else {
+            if(fileWriter.is_open())
+                pthread_mutex_lock(&fileMutex);
             pthread_mutex_lock(&coutMutex);
             switch (action) {
                 case 0:
                     std::cout << "Flower " << flowerId << " withered" << std::endl;
+                    if(fileWriter.is_open())
+                        fileWriter << "Flower " << flowerId << " withered\n";
                     flowerStates[flowerId] = WITHERED;
                     break;
                 case 1:
                     std::cout << "Flower " << flowerId << " needs watering" << std::endl;
+                    if(fileWriter.is_open())
+                        fileWriter <<"Flower " << flowerId << " needs watering\n";
                     flowerStates[flowerId] = NEEDS_WATERING;
                     break;
                 case 2:
                     std::cout << "Flower " << flowerId << " dead" << std::endl;
+                    if(fileWriter.is_open())
+                        fileWriter <<"Flower " << flowerId << " dead\n";
                     flowerStates[flowerId] = DEAD;
                     break;
             }
             pthread_mutex_unlock(&coutMutex);
+            if(fileWriter.is_open())
+                pthread_mutex_unlock(&fileMutex);
         }
         // unlock mutex
         pthread_mutex_unlock(&flowerMutex[flowerId]);
-        usleep(300000);
+        usleep(500000);
     }
     pthread_mutex_unlock(&flowerMutex[flowerId]);
     return nullptr;
@@ -87,15 +101,23 @@ void* gardenerRoutine(void* arg) {
         // lock the mutex
         pthread_mutex_lock(&flowerMutex[index]);
         pthread_mutex_lock(&coutMutex);
+        if(fileWriter.is_open())
+            pthread_mutex_lock(&fileMutex);
         // water the flower if it's needed
         if (flowerStates[index] == NEEDS_WATERING) {
             std::cout <<"Gardener "<<gardenerId<<" waters flower "<<index<<std::endl;
+            if(fileWriter.is_open())
+                fileWriter<< "Gardener "<<gardenerId<<" waters flower\n";
             flowerStates[index] = FRESH;
         }
         else if(flowerStates[index] == DEAD || flowerStates[index] == WITHERED){
+            if(fileWriter.is_open())
+                fileWriter<<"Gardener "<<gardenerId<<" tried to water flower "<<index<<", but it's too late :(\n";
             std::cout<<"Gardener "<<gardenerId<<" tried to water flower "<<index<<", but it's too late :("<<std::endl;
         }
         // unlock the mutex
+        if(fileWriter.is_open())
+            pthread_mutex_unlock(&fileMutex);
         pthread_mutex_unlock(&coutMutex);
         pthread_mutex_unlock(&flowerMutex[index]);
         // gardener rests
@@ -105,15 +127,23 @@ void* gardenerRoutine(void* arg) {
     return nullptr;
 }
 
-
+std::ofstream getFile(int argc, char *argv[]){
+    std::ofstream fout;
+    if(argc == 1)
+        return fout;
+    fout.open(argv[1]);
+    return fout;
+}
 
 int main(int argc, char *argv[]) {
+    fileWriter = getFile(argc, argv);
     // initially all flowers are fresh
     for (int i = 0; i < NUM_FLOWERS; ++i) {
         flowerStates[i] = FRESH;
         pthread_mutex_init(&flowerMutex[i], nullptr);
     }
     pthread_mutex_init(&coutMutex, nullptr);
+    pthread_mutex_init(&fileMutex, nullptr);
     // create gardeners' threads
     pthread_t gardenerThread1, gardenerThread2;
     int gardenerId1 = 1, gardenerId2 = 2;
@@ -136,6 +166,11 @@ int main(int argc, char *argv[]) {
     }
 
     pthread_mutex_destroy(&coutMutex);
+    pthread_mutex_destroy(&fileMutex);
+
+    if(fileWriter.is_open())
+        fileWriter.close();
 
     return 0;
 }
+
