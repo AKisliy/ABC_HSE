@@ -1,10 +1,15 @@
 #include <iostream>
 #include <pthread.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <queue>
+#include <random>
+#include <functional>
 
+std::random_device dev;
+std::default_random_engine generator(dev());
+std::uniform_int_distribution<int> distribution(0, 10000);
+auto dice = std::bind(distribution, generator);
 std::queue<int> queue; // buffer
 std::vector<pthread_t> sum_threads; // vector with adders
 static int counter; // current size of queue
@@ -15,16 +20,16 @@ pthread_mutex_t mutex;
 // Producer's function
 void *Producer(void* param) {
     int pNum = *((int*)param);
-    int time = 1 + rand()%7; // random time to produce
+    int time = 1 + dice()%7; // random time to produce
     sleep(time);
     int data;
-    data = 1 + rand()% 20; // random data
+    data = 1 +  dice()% 20; // random data
     pthread_mutex_lock(&mutex);
     queue.push(data); // push data to queue
     counter++;
     if (counter > 1) // signal
         pthread_cond_signal(&condCounter);
-    printf("Producer %d: Created value = %d\n", pNum, data) ;
+    printf("Producer %d: created value = %d\n", pNum, data) ;
     pthread_mutex_unlock(&mutex);
 
     return nullptr;
@@ -33,8 +38,8 @@ void *Producer(void* param) {
 void *Adder(void* param) {
     int count = *((int*)param);
     int current_index = sum_index++;
-    printf("Summer %d created!\n", current_index) ;
-    int time_sum = 3 + rand() % 4; // random time to sum
+    printf("Adder %d created!\n", current_index) ;
+    int time_sum = 3 +  dice() % 4; // random time to sum
     int sum = 0;
     sleep(time_sum);
     pthread_mutex_lock(&mutex) ;
@@ -47,7 +52,7 @@ void *Adder(void* param) {
     counter++;
     if (counter > 1)
         pthread_cond_signal(&condCounter);
-    printf("Summer %d: Summa read values = %d\n", current_index, sum);
+    printf("Adder %d count sum of values = %d\n", current_index, sum);
     pthread_mutex_unlock(&mutex);
     return nullptr;
 }
@@ -95,8 +100,8 @@ int main() {
         pthread_join(sum_threads[i], nullptr);
     }
 
-    sleep(15); // some sleep 
-    std::cout << "Result is " << queue.front();
+    sleep(15); // some sleep
+    std::cout << "Result = " << queue.front();
     // destroy mutex and conditional var
     pthread_mutex_destroy(&mutex);
     pthread_cond_destroy(&condCounter);
