@@ -128,6 +128,12 @@ void* gardenerRoutine(void* arg) {
                 fileWriter<<"Gardener "<<gardenerId<<" tried to water flower "<<index<<", but it's too late :(\n";
             std::cout<<"Gardener "<<gardenerId<<" tried to water flower "<<index<<", but it's too late :("<<std::endl;
         }
+        else{
+            if(fileWriter.is_open())
+                fileWriter<<"OOPS, Gardener "<<gardenerId<<" watered fresh flower "<<index<<" by accident! \n";
+            std::cout<<"OOPS, Gardener "<<gardenerId<<" watered fresh flower "<<index<<" by accident! \n";
+            flowerStates[index] = WITHERED;
+        }
         // unlock the mutex
         if(fileWriter.is_open())
             pthread_mutex_unlock(&fileMutex);
