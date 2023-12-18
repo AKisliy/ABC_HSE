@@ -35,17 +35,34 @@ void* flowerRoutine(void* arg) {
 
     while (true) {
         // random action
-        int action = dice() % 3;
+        int action = dice() % 2;
         // lock the mutex to change flower's condition
         pthread_mutex_lock(&flowerMutex[flowerId]);
+        // if flower dead - break the work
         if (flowerStates[flowerId] == FlowerState::DEAD || flowerStates[flowerId] == FlowerState::WITHERED) {
             break;
         }
+        bool writeToFile = fileWriter.is_open();
+        if(writeToFile)
+            pthread_mutex_lock(&fileMutex);
+        pthread_mutex_lock(&coutMutex);
+        if(flowerStates[flowerId] == FlowerState::FRESH){
+            switch (action) {
+                case 0:
+                    std::cout << "Flower " << flowerId << " is really fresh" << std::endl;
+                    if(writeToFile)
+                        fileWriter << "Flower " << flowerId << " is really fresh\n";
+                    break;
+                case 1:
+                    std::cout << "Flower " << flowerId << " needs watering" << std::endl;
+                    if(writeToFile)
+                        fileWriter <<"Flower " << flowerId << " needs watering\n";
+                    flowerStates[flowerId] = NEEDS_WATERING;
+                    break;
+            }
+        }
         // simulate flower's action
         else {
-            if(fileWriter.is_open())
-                pthread_mutex_lock(&fileMutex);
-            pthread_mutex_lock(&coutMutex);
             switch (action) {
                 case 0:
                     std::cout << "Flower " << flowerId << " withered" << std::endl;
@@ -54,25 +71,21 @@ void* flowerRoutine(void* arg) {
                     flowerStates[flowerId] = WITHERED;
                     break;
                 case 1:
-                    std::cout << "Flower " << flowerId << " needs watering" << std::endl;
-                    if(fileWriter.is_open())
-                        fileWriter <<"Flower " << flowerId << " needs watering\n";
-                    flowerStates[flowerId] = NEEDS_WATERING;
-                    break;
-                case 2:
                     std::cout << "Flower " << flowerId << " dead" << std::endl;
                     if(fileWriter.is_open())
                         fileWriter <<"Flower " << flowerId << " dead\n";
                     flowerStates[flowerId] = DEAD;
                     break;
             }
-            pthread_mutex_unlock(&coutMutex);
-            if(fileWriter.is_open())
-                pthread_mutex_unlock(&fileMutex);
+
         }
+        pthread_mutex_unlock(&coutMutex);
+        if(writeToFile)
+            pthread_mutex_unlock(&fileMutex);
         // unlock mutex
         pthread_mutex_unlock(&flowerMutex[flowerId]);
-        usleep(500000);
+        // sleep for a while
+        usleep(650000);
     }
     pthread_mutex_unlock(&flowerMutex[flowerId]);
     return nullptr;
@@ -121,7 +134,7 @@ void* gardenerRoutine(void* arg) {
         pthread_mutex_unlock(&coutMutex);
         pthread_mutex_unlock(&flowerMutex[index]);
         // gardener rests
-        usleep(100000);
+        usleep(300000);
     }
 
     return nullptr;
@@ -173,4 +186,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
